@@ -1,0 +1,13 @@
+{
+    "brick": {
+        "bricks": [],
+        "brickNumberPerRow": 4,
+        "undoBricks": []
+    },
+    "score": 0,
+    "bestScore": 0,
+    "tip": ":you have option to undo your last move.",
+    "mode": "Practice mode",
+    "deskWidth":480
+
+}

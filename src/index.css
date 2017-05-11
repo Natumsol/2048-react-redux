@@ -56,6 +56,7 @@ table {
 body {
   background: #E6E6E6;
   font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+  user-select: none;
 }
 .header{
   width: 480px;
@@ -125,12 +126,79 @@ body {
 .brick {
   background: #CCC0B3;
   float: left;
-  margin-left: 1em;
-  margin-top: 1em;
   text-align: center;
-  /*border-radius: 45%;*/
 }
 
 .game-desk {
   width: 480px;
+}
+
+.clear{
+  clear: both;
+}
+
+.element-2{
+	color: #776E65;
+	background: #EEE4DA;
+}
+.element-4{
+	
+	color: #776E65;
+	background: #EDE0C8;
+}
+.element-8{
+	
+	color: #f9f6f2;
+	background: #f2b179;
+}
+.element-16{
+	
+	color: #f9f6f2;
+	background: #f59563;
+}
+.element-32{
+	
+	color: #f9f6f2;
+	background: #f67c5f;
+}
+.element-64{
+	
+	color: #f9f6f2;
+	background: #f65e3b;
+}
+.element-128{
+	
+	color: #f9f6f2;
+	background: #edcf72;
+}
+.element-256{
+	
+	color: #f9f6f2;
+	background: #edcc61;
+}
+.element-512{
+	
+	color: #f9f6f2;
+	background: #edc850;
+}
+.element-1024{
+	
+	color: #f9f6f2;
+	background: #edc53f;
+}
+.element-2048{
+	
+	color: #f9f6f2;
+	background: #edc22e;
+	box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.2381), inset 0 0 0 1px rgba(255, 255, 255, 0.14286);
+}
+.element-4096{
+	
+	color: #f9f6f2;
+	background: #edc22e;
+}
+.element-8192{
+	
+	color: #f9f6f2;
+	background: #edc22e;
 }

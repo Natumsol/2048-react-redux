@@ -58,7 +58,7 @@ class Tips extends Component {
         return (
             <div className='tips'>
                 <strong>{this.props.mode}</strong>
-                <span>{this.props.tips}</span>
+                <span>{this.props.tip}</span>
             </div>
         )
     }
@@ -66,12 +66,12 @@ class Tips extends Component {
 
 Tips.defaultProps = {
     mode: 'Practice mode',
-    tips: ':you have option to undo your last move.'
+    tip: ':you have option to undo your last move.'
 };
 
 Tips.propTypes = {
     mode: PropTypes.string.isRequired,
-    tips: PropTypes.string.isRequired
+    tip: PropTypes.string.isRequired
 };
 
 /** 按钮组件 */
@@ -82,18 +82,18 @@ class ButtonGroup extends Component {
         super(props);
     }
     render() {
+        let {restart, undo} = this.props.action;
         return (
             <div className='button-group'>
-                <div className='btn' onClick={this.props.restart}> RESTART </div>
-                <div className='btn pull-right' onClick={this.props.undo}> UNDO </div>
+                <div className='btn' onClick={ restart}> RESTART </div>
+                <div className='btn pull-right' onClick={ undo}> UNDO </div>
             </div>
         )
     }
 }
 
 ButtonGroup.propTypes = {
-    restart: PropTypes.func,
-    undo: PropTypes.func
+    action: PropTypes.object,
 };
 
 
