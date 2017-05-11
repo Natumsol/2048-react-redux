@@ -1,11 +1,39 @@
 import React, { Component } from 'react';
 import Header from './Components/Header';
+import { connect } from 'react-redux';
 import GameDesk from './Components/GameDesk';
 import './App.css';
 
+const mapDispatchToProps = (dispatch) => {
+  return {
+    move: (pos) => {
+      dispatch({
+        type: 'MOVE',
+        pos: pos
+      })
+    }
+  }
+}
 class App extends Component {
+  componentDidMount() {
+    var self = this;
+    document.addEventListener('keydown', function () {
+      var keycode = event.keyCode;
+      if (keycode == 87 || keycode == 38) {
+        self.props.move('up');
+      }
+      else if (keycode == 83 || keycode == 40) {
+        self.props.move('down');
+      }
+      else if (keycode == 65 || keycode == 37) {
+        self.props.move('left');
+      }
+      else if (keycode == 68 || keycode == 39) {
+        self.props.move('right');
+      }
+    });
+}
   render() {
-    console.log(this.props);
     return (
       <div className="App">
         <Header />
@@ -15,4 +43,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default connect(null, mapDispatchToProps)(App);

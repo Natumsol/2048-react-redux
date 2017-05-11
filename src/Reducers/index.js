@@ -67,6 +67,12 @@ function brciksReducer(state = {
                 });
             }
             return state;
+        case 'MOVE':
+            var { isMoveable, next } = canMove(state.bricks, state.brickNumberPerRow, action.pos);
+            if (isMoveable !== 0xf) return Object.assign({}, state, {
+                bricks: genBrick(next)
+            });
+            return state;
         default:
             return state;
     }
@@ -90,8 +96,154 @@ function genBrick(bricks, brickNumberPerRow) {
 }
 
 
-function move(bricks, pos) {
-    
+
+
+
+function canMove(bricks, brickNumberPerRow, pos) {
+    var isMoveable = 0x0000; // initialize isMoveable;
+    var brickTemp = new Array();
+    var brick_2 = new Array();
+    var i, j, k;
+    var flag = true;
+    for (i = 0; i < brickNumberPerRow; i++) {
+        brickTemp[i] = new Array();
+        brick_2[i] = new Array();
+        for (j = 0; j < brickNumberPerRow; j++) {
+            brickTemp[i][j] = 0;
+            brick_2[i][j] = 0;
+
+        }
+    }
+
+    switch (pos) {
+        case "up": {
+            for (i = 0; i < brickNumberPerRow; i++) {
+
+                for (j = 0, k = 0; j < brickNumberPerRow; j++) {
+                    brickTemp[k][i] = bricks[j][i] ? (k++ , bricks[j][i]) : 0;
+                }// clear zero for each clo
+
+                for (j = 0; j < brickNumberPerRow - 1; j++) {
+                    if (brickTemp[j][i] == brickTemp[j + 1][i] && brickTemp[j][i]) {
+                        brickTemp[j][i] *= 2;
+                        brickTemp[j + 1][i] = 0;
+                    }
+                }// merge
+
+                for (j = 0, k = 0; j < brickNumberPerRow; j++) {
+                    brick_2[j][i] = 0;
+                    brick_2[k][i] = brickTemp[j][i] ? (k++ , brickTemp[j][i]) : 0;
+                }//clear zero
+
+                for (j = 0; j < brickNumberPerRow; j++) {
+                    flag = flag && (brick_2[j][i] == bricks[j][i]);
+                }
+                if (!flag) {
+                    isMoveable |= 0x8;
+                    break;
+                }
+            }
+            break;
+        }
+
+        case "down": {
+            for (i = 0; i < brickNumberPerRow; i++) {
+
+                for (j = brickNumberPerRow - 1, k = brickNumberPerRow - 1; j >= 0; j--) {
+                    brickTemp[k][i] = bricks[j][i] ? (k-- , bricks[j][i]) : 0;
+                }// clear zero for each row
+
+                for (j = brickNumberPerRow - 1; j > 0; j--) {
+                    if (brickTemp[j][i] == brickTemp[j - 1][i] && brickTemp[j][i]) {
+                        brickTemp[j][i] *= 2;
+                        brickTemp[j - 1][i] = 0;
+
+                    }
+                }// merge
+
+                for (j = brickNumberPerRow - 1, k = brickNumberPerRow - 1; j >= 0; j--) {
+                    brick_2[j][i] = 0;
+                    brick_2[k][i] = brickTemp[j][i] ? (k-- , brickTemp[j][i]) : 0;
+                }//clear zero
+
+                for (j = 0; j < brickNumberPerRow; j++) {
+                    flag = flag && (brick_2[j][i] == bricks[j][i]);
+                }
+
+                if (!flag) {
+                    isMoveable |= 0x4;
+                    break;
+                }
+            }
+            break;
+        }
+        case "left": {
+            for (i = 0; i < brickNumberPerRow; i++) {
+
+                for (j = 0, k = 0; j < brickNumberPerRow; j++) {
+                    brickTemp[i][k] = bricks[i][j] ? (k++ , bricks[i][j]) : 0;
+                }// clear zero for each clo
+
+                for (j = 0; j < brickNumberPerRow - 1; j++) {
+                    if (brickTemp[i][j] == brickTemp[i][j + 1] && brickTemp[i][j]) {
+                        brickTemp[i][j] *= 2;
+                        brickTemp[i][j + 1] = 0;
+                    }
+                }// merge
+
+                for (j = 0, k = 0; j < brickNumberPerRow; j++) {
+                    brick_2[i][j] = 0;
+                    brick_2[i][k] = brickTemp[i][j] ? (k++ , brickTemp[i][j]) : 0;
+                }//clear zero
+
+                for (j = 0; j < brickNumberPerRow; j++) {
+                    flag = flag && (brick_2[i][j] == bricks[i][j]);
+                }
+
+                if (!flag) {
+                    isMoveable |= 0x2;
+                    break;
+                }
+            }
+
+            break;
+        }
+
+        case "right": {
+            for (i = 0; i < brickNumberPerRow; i++) {
+
+                for (j = brickNumberPerRow - 1, k = brickNumberPerRow - 1; j >= 0; j--) {
+                    brickTemp[i][k] = bricks[i][j] ? (k-- , bricks[i][j]) : 0;
+                }// clear zero for each row
+
+                for (j = brickNumberPerRow - 1; j > 0; j--) {
+                    if (brickTemp[i][j] == brickTemp[i][j - 1] && brickTemp[i][j]) {
+                        brickTemp[i][j] *= 2;
+                        brickTemp[i][j - 1] = 0;
+                    }
+                }// merge
+
+                for (j = brickNumberPerRow - 1, k = brickNumberPerRow - 1; j >= 0; j--) {
+                    brick_2[i][j] = 0;
+                    brick_2[i][j] = brickTemp[i][j] ? (k-- , brickTemp[i][j]) : 0;
+                }//clear zero
+
+                for (j = 0; j < brickNumberPerRow; j++) {
+                    flag = flag && (brick_2[i][j] == bricks[i][j]);
+                }
+                if (!flag) {
+                    isMoveable |= 0x1;
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
+    return {
+        isMoveable: isMoveable,
+        next: brick_2
+    }
 }
 
 export default combineReducers({
