@@ -1,1 +1,1 @@
-game 2018 powerd by Rect and Redux.
+game 2048 powerd by Rect and Redux.
