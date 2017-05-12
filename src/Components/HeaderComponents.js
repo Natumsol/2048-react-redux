@@ -6,9 +6,6 @@ const Title = () => (<div className='title pull-left '>2048-Lite</div>);
 
 /** 计分组件 */
 class Score extends Component {
-    constructor(props) {
-        super(props);
-    }
     render() {
         return (<div className='score pull-left'>
             <span className='score-title'>SCORE</span>
@@ -28,9 +25,6 @@ Score.propTypes = {
 /** 最高得分组件 */
 
 class BestScore extends Component {
-    constructor(props) {
-        super(props);
-    }
     render() {
         return (<div className='score pull-left '>
             <span className='score-title'>BEST</span>
@@ -51,9 +45,6 @@ BestScore.propTypes = {
 /** 提示组件 */
 
 class Tips extends Component {
-    constructor(props) {
-        super(props);
-    }
     render() {
         return (
             <div className='tips'>
@@ -78,9 +69,6 @@ Tips.propTypes = {
 
 
 class ButtonGroup extends Component {
-    constructor(props) {
-        super(props);
-    }
     render() {
         let {restart, undo} = this.props.action;
         return (

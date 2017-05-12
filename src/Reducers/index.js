@@ -21,7 +21,7 @@ function brciksReducer(state = {
     score: 0,
     bestScore: 0,
 }, action) {
-    var bricks;
+    var bricks, current;
     switch (action.type) {
         case 'INIT_GAME':
             bricks = (new Array(4).fill([])).map(v => (new Array(action.brickNumberPerRow)).fill(0));
@@ -42,23 +42,24 @@ function brciksReducer(state = {
                 bestScore: Math.max(state.score, state.bestScore)
             });
         case 'GENERATE_BRICK':
-            var current = genBrick(JSON.parse(JSON.stringify(state.bricks)), state.brickNumberPerRow);
+            current = genBrick(JSON.parse(JSON.stringify(state.bricks)), state.brickNumberPerRow);
             state.undoBricks.push(JSON.stringify(state.bricks));
             return Object.assign({}, state, {
                 bricks: current
             });
         case 'UNDO':
-            var current = state.undoBricks.pop();
+            current = JSON.parse(state.undoBricks.pop());
             if (current) {
                 return Object.assign({}, state, {
-                    bricks: JSON.parse(current),
-                    undoBricks: state.undoBricks.slice(0)
+                    bricks: current,
+                    undoBricks: state.undoBricks.slice(0),
+                    score: current.map(v => v.reduce((a, b) => a + b)).reduce((a, b) => a + b),
                 });
             }
             return state;
         case 'MOVE':
             var isMoveable = canMove(state.bricks, state.brickNumberPerRow, action.pos);
-            var current = doMove(state.bricks, state.brickNumberPerRow, action.pos, isMoveable)
+            current = doMove(state.bricks, state.brickNumberPerRow, action.pos, isMoveable)
             return Object.assign({}, state, {
                 bricks: current,
                 gameOver: check(state.bricks, state.brickNumberPerRow, state.gameOver),
@@ -75,7 +76,7 @@ function genBrick(bricks, brickNumberPerRow) {
         var row = Math.floor((Math.random()) * brickNumberPerRow);
         var col = Math.floor((Math.random()) * brickNumberPerRow);
     }
-    while (bricks[row][col] != 0)
+    while (bricks[row][col] !== 0)
 
     var rand = Math.floor(Math.random() * 10 + 1)
     if (rand < 7) {
@@ -104,7 +105,7 @@ function doMove(bricks, brickNumberPerRow, pos, isMoveable) {
                     }// clear zero for each clo
 
                     for (j = 0; j < brickNumberPerRow - 1; j++) {
-                        if (brickTemp[j][i] == brickTemp[j + 1][i] && brickTemp[j][i]) {
+                        if (brickTemp[j][i] === brickTemp[j + 1][i] && brickTemp[j][i]) {
                             brickTemp[j][i] *= 2;
                             brickTemp[j + 1][i] = 0;
                         }
@@ -128,7 +129,7 @@ function doMove(bricks, brickNumberPerRow, pos, isMoveable) {
                     }// clear zero for each row
 
                     for (j = brickNumberPerRow - 1; j > 0; j--) {
-                        if (brickTemp[j][i] == brickTemp[j - 1][i] && brickTemp[j][i]) {
+                        if (brickTemp[j][i] === brickTemp[j - 1][i] && brickTemp[j][i]) {
                             brickTemp[j][i] *= 2;
                             brickTemp[j - 1][i] = 0;
                         }
@@ -152,7 +153,7 @@ function doMove(bricks, brickNumberPerRow, pos, isMoveable) {
                     }// clear zero for each clo
 
                     for (j = 0; j < brickNumberPerRow - 1; j++) {
-                        if (brickTemp[i][j] == brickTemp[i][j + 1] && brickTemp[i][j]) {
+                        if (brickTemp[i][j] === brickTemp[i][j + 1] && brickTemp[i][j]) {
                             brickTemp[i][j] *= 2;
                             brickTemp[i][j + 1] = 0;
                         }
@@ -179,7 +180,7 @@ function doMove(bricks, brickNumberPerRow, pos, isMoveable) {
                     }// clear zero for each row
 
                     for (j = brickNumberPerRow - 1; j > 0; j--) {
-                        if (brickTemp[i][j] == brickTemp[i][j - 1] && brickTemp[i][j]) {
+                        if (brickTemp[i][j] === brickTemp[i][j - 1] && brickTemp[i][j]) {
                             brickTemp[i][j] *= 2;
                             brickTemp[i][j - 1] = 0;
                         }
@@ -194,6 +195,7 @@ function doMove(bricks, brickNumberPerRow, pos, isMoveable) {
             }
             break;
         }
+        default: ;
     }
 
     if (needNewBrick) return genBrick(brick_2, brickNumberPerRow);
@@ -217,7 +219,7 @@ function canMove(bricks, brickNumberPerRow, pos) {
                 }// clear zero for each clo
 
                 for (j = 0; j < brickNumberPerRow - 1; j++) {
-                    if (brickTemp[j][i] == brickTemp[j + 1][i] && brickTemp[j][i]) {
+                    if (brickTemp[j][i] === brickTemp[j + 1][i] && brickTemp[j][i]) {
                         brickTemp[j][i] *= 2;
                         brickTemp[j + 1][i] = 0;
                     }
@@ -229,7 +231,7 @@ function canMove(bricks, brickNumberPerRow, pos) {
                 }//clear zero
 
                 for (j = 0; j < brickNumberPerRow; j++) {
-                    flag = flag && (brick_2[j][i] == bricks[j][i]);
+                    flag = flag && (brick_2[j][i] === bricks[j][i]);
                 }
                 if (!flag) {
                     isMoveable |= 0x8;
@@ -247,7 +249,7 @@ function canMove(bricks, brickNumberPerRow, pos) {
                 }// clear zero for each row
 
                 for (j = brickNumberPerRow - 1; j > 0; j--) {
-                    if (brickTemp[j][i] == brickTemp[j - 1][i] && brickTemp[j][i]) {
+                    if (brickTemp[j][i] === brickTemp[j - 1][i] && brickTemp[j][i]) {
                         brickTemp[j][i] *= 2;
                         brickTemp[j - 1][i] = 0;
 
@@ -260,7 +262,7 @@ function canMove(bricks, brickNumberPerRow, pos) {
                 }//clear zero
 
                 for (j = 0; j < brickNumberPerRow; j++) {
-                    flag = flag && (brick_2[j][i] == bricks[j][i]);
+                    flag = flag && (brick_2[j][i] === bricks[j][i]);
                 }
 
                 if (!flag) {
@@ -278,7 +280,7 @@ function canMove(bricks, brickNumberPerRow, pos) {
                 }// clear zero for each clo
 
                 for (j = 0; j < brickNumberPerRow - 1; j++) {
-                    if (brickTemp[i][j] == brickTemp[i][j + 1] && brickTemp[i][j]) {
+                    if (brickTemp[i][j] === brickTemp[i][j + 1] && brickTemp[i][j]) {
                         brickTemp[i][j] *= 2;
                         brickTemp[i][j + 1] = 0;
                     }
@@ -290,7 +292,7 @@ function canMove(bricks, brickNumberPerRow, pos) {
                 }//clear zero
 
                 for (j = 0; j < brickNumberPerRow; j++) {
-                    flag = flag && (brick_2[i][j] == bricks[i][j]);
+                    flag = flag && (brick_2[i][j] === bricks[i][j]);
                 }
 
                 if (!flag) {
@@ -310,7 +312,7 @@ function canMove(bricks, brickNumberPerRow, pos) {
                 }// clear zero for each row
 
                 for (j = brickNumberPerRow - 1; j > 0; j--) {
-                    if (brickTemp[i][j] == brickTemp[i][j - 1] && brickTemp[i][j]) {
+                    if (brickTemp[i][j] === brickTemp[i][j - 1] && brickTemp[i][j]) {
                         brickTemp[i][j] *= 2;
                         brickTemp[i][j - 1] = 0;
                     }
@@ -322,7 +324,7 @@ function canMove(bricks, brickNumberPerRow, pos) {
                 }//clear zero
 
                 for (j = 0; j < brickNumberPerRow; j++) {
-                    flag = flag && (brick_2[i][j] == bricks[i][j]);
+                    flag = flag && (brick_2[i][j] === bricks[i][j]);
                 }
                 if (!flag) {
                     isMoveable |= 0x1;
@@ -331,6 +333,7 @@ function canMove(bricks, brickNumberPerRow, pos) {
             }
             break;
         }
+        default: ;
     }
 
     return isMoveable;
@@ -349,14 +352,14 @@ function check(bricks, brickNumberPerRow, gameOver) {
         }//if there is still zero brick ,game continue;
     }
 
-    for (var i = 0; i < brickNumberPerRow; i++) {
+    for (i = 0; i < brickNumberPerRow; i++) {
         for (var j = 0; j < brickNumberPerRow - 1; j++) {
-            if (bricks[i][j] == bricks[i][j + 1]) {
+            if (bricks[i][j] === bricks[i][j + 1]) {
                 return false;
             }
         }
-        for (var j = 0; j < brickNumberPerRow - 1; j++) {
-            if (bricks[j][i] == bricks[j + 1][i]) {
+        for (j = 0; j < brickNumberPerRow - 1; j++) {
+            if (bricks[j][i] === bricks[j + 1][i]) {
                 return false;
             }
         }

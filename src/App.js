@@ -30,16 +30,16 @@ class App extends Component {
     var self = this;
     document.addEventListener('keydown', function () {
       var keycode = event.keyCode;
-      if (keycode == 87 || keycode == 38) {
+      if (keycode === 87 || keycode === 38) {
         self.props.move('up');
       }
-      else if (keycode == 83 || keycode == 40) {
+      else if (keycode === 83 || keycode === 40) {
         self.props.move('down');
       }
-      else if (keycode == 65 || keycode == 37) {
+      else if (keycode === 65 || keycode === 37) {
         self.props.move('left');
       }
-      else if (keycode == 68 || keycode == 39) {
+      else if (keycode === 68 || keycode === 39) {
         self.props.move('right');
       }
     });
@@ -47,7 +47,9 @@ class App extends Component {
 
   componentDidUpdate() {
     if(this.props.gameOver) {
-      alert("you lose");
+      if(confirm("游戏似乎已结束，是否重新开始？")) {
+        this.props.restart();
+      }
     }
   }
   render() {

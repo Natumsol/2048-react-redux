@@ -26,12 +26,7 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 class Header extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
-        console.log(this.props);
         return (
             <div className='header'>
                 <Title />
@@ -45,4 +40,15 @@ class Header extends Component {
     }
 }
 
+
+Header.propTypes = {
+    score: PropTypes.number.isRequired,
+    bestScore: PropTypes.number.isRequired,
+    mode: PropTypes.string,
+    tip:PropTypes.string,
+    action: PropTypes.shape({
+        restart: PropTypes.func.isRequired,
+        undo: PropTypes.func.isRequired
+    })
+}
 export default connect(mapStateToProps, mapDispatchToProps)(Header);
