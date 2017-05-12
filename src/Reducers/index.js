@@ -4,26 +4,9 @@ function mainReducer(state = {}, action) {
     switch (action.type) {
         case 'INIT_GAME':
             return Object.assign({}, state, {
-                score: 0,
-                bestScore: 0,
                 tip: ':you have option to undo your last move.',
                 mode: 'Practice mode',
                 deskWidth: 480,
-                isWin: false,
-                isLose: false
-            });
-        case 'RESTART_GAME':
-            return Object.assign({}, state, {
-                score: 0,
-                bestScore: Math.max(state.score, state.bestScore),
-            });
-        case 'WIN':
-            return Object.assign({}, state, {
-                isWin: true,
-            });
-        case 'LOSE':
-            return Object.assign({}, state, {
-                isLose: true,
             });
         default:
             return state;
@@ -33,7 +16,10 @@ function mainReducer(state = {}, action) {
 function brciksReducer(state = {
     bricks: [],
     brickNumberPerRow: 4,
-    undoBricks: []
+    undoBricks: [],
+    gameOver: false,
+    score: 0,
+    bestScore: 0,
 }, action) {
     var bricks;
     switch (action.type) {
@@ -51,11 +37,13 @@ function brciksReducer(state = {
             bricks = genBrick(bricks, state.brickNumberPerRow);
             bricks = genBrick(bricks, state.brickNumberPerRow);
             return Object.assign({}, state, {
-                bricks: bricks
+                bricks: bricks,
+                score: 0,
+                bestScore: Math.max(state.score, state.bestScore)
             });
         case 'GENERATE_BRICK':
             var current = genBrick(JSON.parse(JSON.stringify(state.bricks)), state.brickNumberPerRow);
-            state.undoBricks.push(JSON.parse(JSON.stringify(state.bricks)));
+            state.undoBricks.push(JSON.stringify(state.bricks));
             return Object.assign({}, state, {
                 bricks: current
             });
@@ -63,16 +51,20 @@ function brciksReducer(state = {
             var current = state.undoBricks.pop();
             if (current) {
                 return Object.assign({}, state, {
-                    bricks: current
+                    bricks: JSON.parse(current),
+                    undoBricks: state.undoBricks.slice(0)
                 });
             }
             return state;
         case 'MOVE':
-            var { isMoveable, next } = canMove(state.bricks, state.brickNumberPerRow, action.pos);
-            if (isMoveable !== 0xf) return Object.assign({}, state, {
-                bricks: genBrick(next)
+            var isMoveable = canMove(state.bricks, state.brickNumberPerRow, action.pos);
+            var current = doMove(state.bricks, state.brickNumberPerRow, action.pos, isMoveable)
+            return Object.assign({}, state, {
+                bricks: current,
+                gameOver: check(state.bricks, state.brickNumberPerRow, state.gameOver),
+                score: current.map(v => v.reduce((a, b) => a + b)).reduce((a, b) => a + b),
+                undoBricks: state.undoBricks.concat(JSON.stringify(state.bricks))
             });
-            return state;
         default:
             return state;
     }
@@ -96,24 +88,125 @@ function genBrick(bricks, brickNumberPerRow) {
 }
 
 
+function doMove(bricks, brickNumberPerRow, pos, isMoveable) {
+    let brickTemp = initBrick(brickNumberPerRow),// temp for move
+        brick_2 = deepClone(bricks),
+        i, j, k,
+        needNewBrick = false;
 
+    switch (pos) {
+        case "up": {
+            if (isMoveable & 0x8) {
+                for (i = 0; i < brickNumberPerRow; i++) {
 
+                    for (j = 0, k = 0; j < brickNumberPerRow; j++) {
+                        brickTemp[k][i] = brick_2[j][i] ? (k++ , brick_2[j][i]) : 0;
+                    }// clear zero for each clo
 
-function canMove(bricks, brickNumberPerRow, pos) {
-    var isMoveable = 0x0000; // initialize isMoveable;
-    var brickTemp = new Array();
-    var brick_2 = new Array();
-    var i, j, k;
-    var flag = true;
-    for (i = 0; i < brickNumberPerRow; i++) {
-        brickTemp[i] = new Array();
-        brick_2[i] = new Array();
-        for (j = 0; j < brickNumberPerRow; j++) {
-            brickTemp[i][j] = 0;
-            brick_2[i][j] = 0;
+                    for (j = 0; j < brickNumberPerRow - 1; j++) {
+                        if (brickTemp[j][i] == brickTemp[j + 1][i] && brickTemp[j][i]) {
+                            brickTemp[j][i] *= 2;
+                            brickTemp[j + 1][i] = 0;
+                        }
+                    }// merge
 
+                    for (j = 0, k = 0; j < brickNumberPerRow; j++) {
+                        brick_2[j][i] = 0;
+                        brick_2[k][i] = brickTemp[j][i] ? (k++ , brickTemp[j][i]) : 0;
+                    }//clear zero
+                    needNewBrick = true;
+                }
+            }
+            break;
+        }
+        case "down": {
+            if (isMoveable & 0x4) {
+                for (i = 0; i < brickNumberPerRow; i++) {
+
+                    for (j = brickNumberPerRow - 1, k = brickNumberPerRow - 1; j >= 0; j--) {
+                        brickTemp[k][i] = brick_2[j][i] ? (k-- , brick_2[j][i]) : 0;
+                    }// clear zero for each row
+
+                    for (j = brickNumberPerRow - 1; j > 0; j--) {
+                        if (brickTemp[j][i] == brickTemp[j - 1][i] && brickTemp[j][i]) {
+                            brickTemp[j][i] *= 2;
+                            brickTemp[j - 1][i] = 0;
+                        }
+                    }// merge
+
+                    for (j = brickNumberPerRow - 1, k = brickNumberPerRow - 1; j >= 0; j--) {
+                        brick_2[j][i] = 0;
+                        brick_2[k][i] = brickTemp[j][i] ? (k-- , brickTemp[j][i]) : 0;
+                    }//clear zero
+                }
+                needNewBrick = true;
+            }
+            break;
+        }
+        case "left": {
+            if (isMoveable & 0x2) {
+                for (i = 0; i < brickNumberPerRow; i++) {
+
+                    for (j = 0, k = 0; j < brickNumberPerRow; j++) {
+                        brickTemp[i][k] = brick_2[i][j] ? (k++ , brick_2[i][j]) : 0;
+                    }// clear zero for each clo
+
+                    for (j = 0; j < brickNumberPerRow - 1; j++) {
+                        if (brickTemp[i][j] == brickTemp[i][j + 1] && brickTemp[i][j]) {
+                            brickTemp[i][j] *= 2;
+                            brickTemp[i][j + 1] = 0;
+                        }
+                    }// merge
+
+                    for (j = 0, k = 0; j < brickNumberPerRow; j++) {
+                        brick_2[i][j] = 0;
+                        brick_2[i][k] = brickTemp[i][j] ? (k++ , brickTemp[i][j]) : 0;
+                    }//clear zero
+
+                }
+                needNewBrick = true;
+
+            }
+            break;
+        }
+
+        case "right": {
+            if (isMoveable & 0x1) {
+                for (i = 0; i < brickNumberPerRow; i++) {
+
+                    for (j = brickNumberPerRow - 1, k = brickNumberPerRow - 1; j >= 0; j--) {
+                        brickTemp[i][k] = brick_2[i][j] ? (k-- , brick_2[i][j]) : 0;
+                    }// clear zero for each row
+
+                    for (j = brickNumberPerRow - 1; j > 0; j--) {
+                        if (brickTemp[i][j] == brickTemp[i][j - 1] && brickTemp[i][j]) {
+                            brickTemp[i][j] *= 2;
+                            brickTemp[i][j - 1] = 0;
+                        }
+                    }// merge
+
+                    for (j = brickNumberPerRow - 1, k = brickNumberPerRow - 1; j >= 0; j--) {
+                        brick_2[i][j] = 0;
+                        brick_2[i][k] = brickTemp[i][j] ? (k-- , brickTemp[i][j]) : 0;
+                    }//clear zero
+                }
+                needNewBrick = true;
+            }
+            break;
         }
     }
+
+    if (needNewBrick) return genBrick(brick_2, brickNumberPerRow);
+    return brick_2
+}
+
+/*  判断是否能移动  */
+function canMove(bricks, brickNumberPerRow, pos) {
+    let isMoveable = 0x0000, // 初始化;
+        brickTemp = initBrick(brickNumberPerRow),
+        brick_2 = initBrick(brickNumberPerRow),
+        i, j, k,
+        flag = true;
 
     switch (pos) {
         case "up": {
@@ -240,12 +333,44 @@ function canMove(bricks, brickNumberPerRow, pos) {
         }
     }
 
-    return {
-        isMoveable: isMoveable,
-        next: brick_2
-    }
+    return isMoveable;
 }
 
+
+function check(bricks, brickNumberPerRow, gameOver) {
+    if (gameOver) {
+        return gameOver;
+    }// if there is brick which is equal to this.end,game over;
+    for (var i = 0; i < brickNumberPerRow; i++) {
+        if (bricks[i].some(function (item, index, array) {
+            return item === 0;
+        })) {
+            return false;
+        }//if there is still zero brick ,game continue;
+    }
+
+    for (var i = 0; i < brickNumberPerRow; i++) {
+        for (var j = 0; j < brickNumberPerRow - 1; j++) {
+            if (bricks[i][j] == bricks[i][j + 1]) {
+                return false;
+            }
+        }
+        for (var j = 0; j < brickNumberPerRow - 1; j++) {
+            if (bricks[j][i] == bricks[j + 1][i]) {
+                return false;
+            }
+        }
+    }// 如果有两个相邻的方块，则游戏未结束;
+
+    return true;
+}
+function initBrick(brickNumberPerRow) {
+    return (new Array(brickNumberPerRow)).fill([]).map(v => (new Array(brickNumberPerRow)).fill(0))
+}
+
+function deepClone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
 export default combineReducers({
     bricks: brciksReducer,
     main: mainReducer

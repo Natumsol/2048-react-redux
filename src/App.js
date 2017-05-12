@@ -11,7 +11,18 @@ const mapDispatchToProps = (dispatch) => {
         type: 'MOVE',
         pos: pos
       })
+    },
+    restart: () => {
+      dispatch({
+        type: 'RESTART_GAME'
+      })
     }
+  }
+}
+
+const mapStateToProps = (state) => {
+  return {
+    gameOver: state.bricks.gameOver
   }
 }
 class App extends Component {
@@ -32,7 +43,13 @@ class App extends Component {
         self.props.move('right');
       }
     });
-}
+  }
+
+  componentDidUpdate() {
+    if(this.props.gameOver) {
+      alert("you lose");
+    }
+  }
   render() {
     return (
       <div className="App">
@@ -43,4 +60,4 @@ class App extends Component {
   }
 }
 
-export default connect(null, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);
