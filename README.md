@@ -1,5 +1,6 @@
 # 2048_React_Redux
 2048 powerd by React and Redux.
+
 ![](./sc.jpg)
 
 ## Quick Started
