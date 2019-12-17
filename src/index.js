@@ -6,7 +6,7 @@ import App from './App';
 import reducers from "./Reducers"
 import './index.css';
 
-let  store = createStore(reducers);
+let store = createStore(reducers);
 
 store.dispatch({
   type: 'INIT_GAME',

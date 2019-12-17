@@ -14,7 +14,7 @@ const mapDispatchToProps = (dispatch) => {
     return {
         restart: () => {
             dispatch({
-                type:'RESTART_GAME'
+                type: 'RESTART_GAME'
             })
         }
     }
@@ -37,23 +37,24 @@ class GameDesk extends Component {
 
     render() {
         const fontSizeTable = { // 字体大小表
-            '2': '6.25em',
-            '4': '6.25em',
-            '8': '6.25em',
-            '16': '5em',
-            '32': '5em',
-            '64': '5em',
-            '128': '3.75em',
-            '256': '3.75em',
-            '512': '3.75em',
-            '1024': '2.81em',
-            '2048': '2.81em'
+            '2': '4.25em',
+            '4': '4.25em',
+            '8': '4.25em',
+            '16': '3em',
+            '32': '3em',
+            '64': '3em',
+            '128': '2.75em',
+            '256': '2.75em',
+            '512': '2.75em',
+            '1024': '1.81em',
+            '2048': '1.81em'
         };
         return (
             <div className='game-desk clearfix'>
                 {this.props.bricks.map(row => row.map((brick, index) => {
-                    return <Brick style={Object.assign({}, this.state.style, {
-                        fontSize: fontSizeTable[brick]
+                    return <Brick key={index} style={Object.assign({}, this.state.style, {
+                        fontSize: fontSizeTable[brick],
+                        fontWeight: 700
                     })} value={brick} />
                 }))}
             </div>

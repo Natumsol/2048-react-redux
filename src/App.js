@@ -28,7 +28,7 @@ const mapStateToProps = (state) => {
 class App extends Component {
   componentDidMount() {
     var self = this;
-    document.addEventListener('keydown', function () {
+    document.addEventListener('keydown', function (event) {
       var keycode = event.keyCode;
       if (keycode === 87 || keycode === 38) {
         self.props.move('up');
@@ -47,7 +47,7 @@ class App extends Component {
 
   componentDidUpdate() {
     if(this.props.gameOver) {
-      if(confirm("游戏似乎已结束，是否重新开始？")) {
+      if(window.confirm("游戏似乎已结束，是否重新开始？")) {
         this.props.restart();
       }
     }

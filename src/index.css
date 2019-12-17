@@ -54,9 +54,11 @@ table {
 }
 
 body {
-  background: #E6E6E6;
+  margin: 0;
+  padding: 0;
+  background: #faf8ef;
+  color: #776e65;
   font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
-  user-select: none;
 }
 .header{
   width: 480px;
@@ -127,6 +129,7 @@ body {
   background: #CCC0B3;
   float: left;
   text-align: center;
+  border-radius: 5px;
 }
 
 .game-desk {
