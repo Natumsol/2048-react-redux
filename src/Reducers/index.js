@@ -59,11 +59,12 @@ function brciksReducer(state = {
             return state;
         case 'MOVE':
             var isMoveable = canMove(state.bricks, state.brickNumberPerRow, action.pos);
-            current = doMove(state.bricks, state.brickNumberPerRow, action.pos, isMoveable)
+            var currentScore;
+            [current, currentScore] = doMove(state.bricks, state.brickNumberPerRow, action.pos, isMoveable)
             return Object.assign({}, state, {
                 bricks: current,
                 gameOver: check(state.bricks, state.brickNumberPerRow, state.gameOver),
-                score: current.map(v => v.reduce((a, b) => a + b)).reduce((a, b) => a + b),
+                score: state.score + currentScore,
                 undoBricks: state.undoBricks.concat(JSON.stringify(state.bricks))
             });
         default:
@@ -94,7 +95,7 @@ function doMove(bricks, brickNumberPerRow, pos, isMoveable) {
         brick_2 = deepClone(bricks),
         i, j, k,
         needNewBrick = false;
-
+    let currentScore = 0;
     switch (pos) {
         case "up": {
             if (isMoveable & 0x8) {
@@ -107,6 +108,7 @@ function doMove(bricks, brickNumberPerRow, pos, isMoveable) {
                     for (j = 0; j < brickNumberPerRow - 1; j++) {
                         if (brickTemp[j][i] === brickTemp[j + 1][i] && brickTemp[j][i]) {
                             brickTemp[j][i] *= 2;
+                            currentScore += brickTemp[j][i];
                             brickTemp[j + 1][i] = 0;
                         }
                     }// merge
@@ -131,6 +133,7 @@ function doMove(bricks, brickNumberPerRow, pos, isMoveable) {
                     for (j = brickNumberPerRow - 1; j > 0; j--) {
                         if (brickTemp[j][i] === brickTemp[j - 1][i] && brickTemp[j][i]) {
                             brickTemp[j][i] *= 2;
+                            currentScore += brickTemp[j][i];
                             brickTemp[j - 1][i] = 0;
                         }
                     }// merge
@@ -155,6 +158,7 @@ function doMove(bricks, brickNumberPerRow, pos, isMoveable) {
                     for (j = 0; j < brickNumberPerRow - 1; j++) {
                         if (brickTemp[i][j] === brickTemp[i][j + 1] && brickTemp[i][j]) {
                             brickTemp[i][j] *= 2;
+                            currentScore += brickTemp[i][j];
                             brickTemp[i][j + 1] = 0;
                         }
                     }// merge
@@ -181,7 +185,10 @@ function doMove(bricks, brickNumberPerRow, pos, isMoveable) {
 
                     for (j = brickNumberPerRow - 1; j > 0; j--) {
                         if (brickTemp[i][j] === brickTemp[i][j - 1] && brickTemp[i][j]) {
+                            
+
                             brickTemp[i][j] *= 2;
+                            currentScore += brickTemp[i][j];
                             brickTemp[i][j - 1] = 0;
                         }
                     }// merge
@@ -197,9 +204,8 @@ function doMove(bricks, brickNumberPerRow, pos, isMoveable) {
         }
         default: ;
     }
-
-    if (needNewBrick) return genBrick(brick_2, brickNumberPerRow);
-    return brick_2
+    console.log('currentScore', currentScore)
+    return [needNewBrick ? genBrick(brick_2, brickNumberPerRow) : brick_2, currentScore];
 }
 
 /*  判断是否能移动  */
