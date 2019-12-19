@@ -13,7 +13,7 @@ function mainReducer(state = {}, action) {
     }
 }
 
-function brciksReducer(state = {
+function bricksReducer(state = {
     bricks: [],
     brickNumberPerRow: 4,
     undoBricks: [],
@@ -381,6 +381,6 @@ function deepClone(obj) {
     return JSON.parse(JSON.stringify(obj));
 }
 export default combineReducers({
-    bricks: brciksReducer,
+    bricks: bricksReducer,
     main: mainReducer
 })
