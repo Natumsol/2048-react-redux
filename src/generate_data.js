@@ -408,4 +408,4 @@ function generateData(epoch = 1) {
   }
 }
 
-generateData(2)
+generateData(10)
